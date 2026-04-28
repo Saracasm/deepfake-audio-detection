@@ -88,5 +88,5 @@ datasets:
 # --- Logging ---
 wandb:
   project: "deepfake-audio-detection"
-  entity: null               # set to your wandb username
+  entity: "sara-jaffrani17-dlp"               
   log_freq: 10               # log every N training steps
