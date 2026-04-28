@@ -1,0 +1,51 @@
+# Data and model artifacts (never commit these)
+data/raw/
+data/processed/
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.bin
+
+# Logs
+logs/
+wandb/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Secrets — never commit these
+.env
+.env.local
+*.key
+wandb_api_key.txt
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Jupyter
+.jupyter/
+
+# Build / dist
+build/
+dist/
+
+# Allow protocol files (small, safe to commit)
+!data/protocols/

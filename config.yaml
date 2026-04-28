@@ -1,0 +1,92 @@
+# Deepfake Audio Detection — Central Configuration
+# All hyperparameters, paths, and settings live here.
+# Notebooks and scripts read from this file rather than hardcoding values.
+
+project:
+  name: "deepfake-audio-detection"
+  seed: 42
+
+# --- Paths (Colab + Drive) ---
+paths:
+  drive_root: "/content/drive/MyDrive/deepfake_audio"
+  data_raw: "/content/drive/MyDrive/deepfake_audio/data/raw"
+  data_processed: "/content/drive/MyDrive/deepfake_audio/data/processed"
+  checkpoints: "/content/drive/MyDrive/deepfake_audio/checkpoints"
+  logs: "/content/drive/MyDrive/deepfake_audio/logs"
+
+# --- Audio preprocessing ---
+audio:
+  sample_rate: 16000        # Hz, must match Wav2Vec 2.0 pretraining
+  channels: 1               # mono
+  window_seconds: 4.0       # length of each training segment
+  overlap_ratio: 0.5        # 50% overlap between consecutive windows
+  pad_short_clips: true     # zero-pad clips shorter than window_seconds
+
+# --- Model ---
+model:
+  base: "facebook/wav2vec2-base"   # 95M params, 12 transformer layers
+  num_classes: 2                   # bona fide vs spoof
+  pooling: "mean"                  # mean | max | attentive
+
+# --- Training: Stage 1 (frozen backbone) ---
+stage1:
+  freeze_backbone: true
+  learning_rate: 1.0e-3
+  batch_size: 32
+  epochs: 5
+  optimizer: "adamw"
+  weight_decay: 0.01
+  early_stopping_patience: 3
+
+# --- Training: Stage 2 (partial fine-tuning) ---
+stage2:
+  freeze_backbone: false
+  unfreeze_top_n_layers: 2     # of 12 transformer layers
+  learning_rate: 1.0e-5         # 100x smaller than stage 1
+  batch_size: 16                # smaller — full backprop through some layers
+  epochs: 12
+  optimizer: "adamw"
+  weight_decay: 0.01
+  warmup_ratio: 0.1
+  scheduler: "linear"
+  early_stopping_patience: 3
+  mixed_precision: true
+
+# --- Loss ---
+loss:
+  type: "weighted_cross_entropy"
+  # Weights computed from class frequencies: 2580 bona fide vs 22800 spoof
+  # weight = total / (n_classes * count) → roughly [4.92, 0.56]
+
+# --- Augmentation (Stage 2 only) ---
+augmentation:
+  enabled: true
+  noise_injection:
+    enabled: true
+    snr_range_db: [10, 30]
+  rir_convolution:
+    enabled: false             # dropped per cut priority
+
+# --- Evaluation ---
+evaluation:
+  metrics: ["eer", "t_dcf", "auc_roc"]
+  aggregation_across_windows: "mean"  # mean | median of per-window probs
+
+# --- Datasets ---
+datasets:
+  asvspoof_2019_la:
+    role: "primary"
+    download_url: "https://datashare.ed.ac.uk/handle/10283/3336"
+  asvspoof_2021_la:
+    role: "secondary"
+    download_url: "https://www.asvspoof.org/index2021.html"
+  wavefake:
+    role: "supplementary"
+    sample_per_vocoder: 1500
+    bona_fide_source: "ljspeech"
+
+# --- Logging ---
+wandb:
+  project: "deepfake-audio-detection"
+  entity: null               # set to your wandb username
+  log_freq: 10               # log every N training steps
