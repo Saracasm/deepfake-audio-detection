@@ -1,20 +1,21 @@
 # Environment
 
-This document records the exact environment used for this project. After running the smoke-test notebook, fill in the values below from the printed output.
+This document records the exact environment used for this project.
 
 ## Platform
 
 - **Compute:** Google Colab Pro
-- **GPU:** _(fill from smoke test, e.g. "Tesla T4, 15 GB")_
-- **CUDA version:** _(fill from smoke test)_
-- **Python version:** _(fill from smoke test, e.g. "3.11.x")_
+- **GPU:** Tesla T4, 15.64 GB
+- **CUDA version:** 12.1
+- **Python version:** 3.12.13
+- **OS:** Linux-6.6.113+-x86_64-with-glibc2.35
 
 ## Key Library Versions
 
 (See `requirements.txt` for the full pinned list)
 
-- torch: 2.4.0
-- torchaudio: 2.4.0
+- torch: 2.4.0+cu121
+- torchaudio: 2.4.0+cu121
 - transformers: 4.44.2
 
 ## Storage
@@ -26,22 +27,17 @@ This document records the exact environment used for this project. After running
 
 ## Experiment Tracking
 
-- **wandb project:** `deepfake-audio-detection`
-- **wandb entity:** _(your wandb username)_
+- **Wandb project:** `deepfake-audio-detection`
+- **Wandb entity:** `sara-jaffrani17-dlp`
 
-## Reproducibility Notes
+## Reproducibility
 
 - Random seed: `42` (set in `src/utils/seed.py`)
 - Sample rate: 16 kHz mono throughout
 - Window length: 4 seconds with 50% overlap
 - Padding for short clips: zero-pad to 4 seconds
 
-## Installation Order Notes
+## Phase 1 Verification
 
-If reinstalling on a fresh Colab session:
-
-1. Mount Drive first
-2. Clone repo into `/content/`
-3. `pip install -r requirements.txt --quiet`
-4. Restart runtime ONCE after install (Runtime → Restart session)
-5. Run smoke test to verify
+Phase 1 smoke test run: 2026-04-28 21:10
+All checks passed: GPU detected, Drive mounted, Wav2Vec 2.0 loaded, forward pass succeeded, wandb run logged.
