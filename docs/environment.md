@@ -32,12 +32,12 @@ This document records the exact environment used for this project.
 
 ## Reproducibility
 
-- Random seed: `42` (set in `src/utils/seed.py`)
+- Random seed: `42`
 - Sample rate: 16 kHz mono throughout
 - Window length: 4 seconds with 50% overlap
 - Padding for short clips: zero-pad to 4 seconds
 
 ## Phase 1 Verification
 
-Phase 1 smoke test run: 2026-04-28 21:10
+Phase 1 smoke test: 2026-04-28
 All checks passed: GPU detected, Drive mounted, Wav2Vec 2.0 loaded, forward pass succeeded, wandb run logged.
