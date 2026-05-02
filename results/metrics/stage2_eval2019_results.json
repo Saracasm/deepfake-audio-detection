@@ -1,0 +1,90 @@
+{
+  "phase": "Phase 5 \u2014 Primary Evaluation on ASVspoof 2019 LA Eval Set",
+  "completed_at": "2026-05-02T23:27:40.642174",
+  "model_checkpoint": "/content/drive/MyDrive/deepfake_audio/checkpoints/stage2_best.pt",
+  "model_dev_eer": 0.0069,
+  "evaluation_dataset": {
+    "name": "ASVspoof 2019 LA Eval Set",
+    "utterances": 71237,
+    "windows": 91386,
+    "bonafide_count": 7355,
+    "spoof_count": 63882,
+    "attack_ids_unseen": [
+      "A07",
+      "A08",
+      "A09",
+      "A10",
+      "A11",
+      "A12",
+      "A13",
+      "A14",
+      "A15",
+      "A16",
+      "A17",
+      "A18",
+      "A19"
+    ]
+  },
+  "inference": {
+    "batch_size": 16,
+    "mixed_precision": true,
+    "wall_clock_minutes": 12.0,
+    "windows_per_second": 127
+  },
+  "overall_results": {
+    "eer": 0.0555,
+    "auc": 0.9885,
+    "accuracy": 0.9445,
+    "threshold": 0.0
+  },
+  "generalization_analysis": {
+    "dev_eer_seen_attacks_A01_A06": 0.0069,
+    "eval_eer_unseen_attacks_A07_A19": 0.0555,
+    "gap_percentage_points": 4.86,
+    "interpretation": "Healthy generalization gap. Model retains useful spoofing detection signal on unseen attacks."
+  },
+  "per_attack_eer": {
+    "A07": 0.0581,
+    "A08": 0.0063,
+    "A09": 0.006,
+    "A10": 0.1554,
+    "A11": 0.0105,
+    "A12": 0.0099,
+    "A13": 0.0024,
+    "A14": 0.0605,
+    "A15": 0.0753,
+    "A16": 0.0231,
+    "A17": 0.0382,
+    "A18": 0.0272,
+    "A19": 0.0379
+  },
+  "per_attack_summary": {
+    "n_attacks": 13,
+    "samples_per_attack": 4914,
+    "mean_eer": 0.0393,
+    "median_eer": 0.0272,
+    "worst_attack": {
+      "id": "A10",
+      "eer": 0.1554
+    },
+    "best_attack": {
+      "id": "A13",
+      "eer": 0.0024
+    }
+  },
+  "comparisons_to_published_baselines": {
+    "asvspoof_2019_lfcc_gmm_baseline_eer": 0.0809,
+    "improvement_over_baseline_pp": 2.54,
+    "interpretation": "Stage 2 model outperforms the official ASVspoof 2019 LFCC-GMM baseline by 2.54 percentage points."
+  },
+  "raw_scores_path": "/content/deepfake-audio-detection/results/scores/stage2_eval2019.npz",
+  "wandb_run": "https://wandb.ai/sara-jaffrani17-dlp/deepfake-audio-detection/runs/l1q4dvsx",
+  "notes": [
+    "Primary evaluation on the ASVspoof 2019 LA eval set (71,237 utterances, A07-A19 unseen attacks).",
+    "Overall EER 5.55% beats the official LFCC-GMM baseline (8.09%) by 2.54 pp.",
+    "Per-attack analysis reveals A10 as the model's weakest point (15.54% EER, ~3x harder than next-worst).",
+    "Median per-attack EER of 2.72% indicates strong generalization on most attack families.",
+    "Generalization gap of 4.86 pp from dev (0.69%) to eval (5.55%) is healthy and expected.",
+    "Phase 5 next steps: cross-dataset evaluation on ASVspoof 2021 LA and WaveFake."
+  ]
+}
