@@ -1,0 +1,129 @@
+{
+  "phase": "Stage 2 \u2014 fine-tuning top 2 transformer layers",
+  "completed_at": "2026-05-02T22:58:03.361739",
+  "model": "facebook/wav2vec2-base",
+  "starting_checkpoint": "stage1_best.pt (dev EER 10.09%)",
+  "trainable_params": 14178818,
+  "total_params": 94373250,
+  "trainable_percent": 15.02,
+  "training": {
+    "epochs": 10,
+    "batch_size": 16,
+    "learning_rate": 1e-05,
+    "warmup_ratio": 0.1,
+    "lr_schedule": "linear warmup + linear decay to zero",
+    "weight_decay": 0.01,
+    "grad_clip": 1.0,
+    "class_weights": {
+      "bonafide": 4.919,
+      "spoof": 0.557
+    },
+    "loss": "weighted_cross_entropy",
+    "mixed_precision": true,
+    "wall_clock_hours": 2.93,
+    "early_stopping_patience": 3,
+    "early_stopping_triggered": false
+  },
+  "data": {
+    "train_utterances": 25380,
+    "train_windows": 34036,
+    "dev_utterances": 24844,
+    "dev_windows": 34047
+  },
+  "epoch_history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.1501,
+      "dev_eer": 0.0329,
+      "dev_auc": 0.9965,
+      "dev_accuracy": 0.9672
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.0734,
+      "dev_eer": 0.0145,
+      "dev_auc": 0.9987,
+      "dev_accuracy": 0.9855
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.0504,
+      "dev_eer": 0.0122,
+      "dev_auc": 0.999,
+      "dev_accuracy": 0.9879
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.0506,
+      "dev_eer": 0.0142,
+      "dev_auc": 0.9984,
+      "dev_accuracy": 0.9861
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.0405,
+      "dev_eer": 0.0119,
+      "dev_auc": 0.9987,
+      "dev_accuracy": 0.988
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.0191,
+      "dev_eer": 0.0102,
+      "dev_auc": 0.9985,
+      "dev_accuracy": 0.9897
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.0195,
+      "dev_eer": 0.0084,
+      "dev_auc": 0.9986,
+      "dev_accuracy": 0.9917
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.0097,
+      "dev_eer": 0.0079,
+      "dev_auc": 0.9984,
+      "dev_accuracy": 0.9921
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.0113,
+      "dev_eer": 0.0069,
+      "dev_auc": 0.9984,
+      "dev_accuracy": 0.9931
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.0069,
+      "dev_eer": 0.0082,
+      "dev_auc": 0.9988,
+      "dev_accuracy": 0.9915
+    }
+  ],
+  "best": {
+    "dev_eer": 0.0069,
+    "dev_auc": 0.9984,
+    "dev_accuracy": 0.9931,
+    "epoch": 9,
+    "checkpoint": "/content/drive/MyDrive/deepfake_audio/checkpoints/stage2_best.pt"
+  },
+  "improvement_over_stage1": {
+    "stage1_dev_eer": 0.1009,
+    "stage2_dev_eer": 0.0069,
+    "absolute_improvement_percentage_points": 9.4,
+    "relative_error_reduction_percent": 93.16
+  },
+  "wandb_run": "https://wandb.ai/sara-jaffrani17-dlp/deepfake-audio-detection/runs/l1q4dvsx",
+  "notes": [
+    "Stage 2 unfroze the top 2 transformer encoder layers (10, 11) plus final layer norm.",
+    "14.18M trainable parameters (15.02% of total model).",
+    "Started from Stage 1 checkpoint with 10.09% dev EER.",
+    "Best dev EER 0.69% achieved at epoch 9, with mild overfitting beginning at epoch 10.",
+    "Training stable throughout: no NaN, no loss spikes, smooth convergence.",
+    "Dev accuracy 99.31%, dev AUC 0.9984 \u2014 model is now in the territory of strong published systems on ASVspoof 2019 LA.",
+    "IMPORTANT CAVEAT: Dev set contains same attacks as training (A01-A06).",
+    "Eval set contains unseen attacks (A07-A19). True generalization test is forthcoming in Phase 5."
+  ]
+}
