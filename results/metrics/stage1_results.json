@@ -1,0 +1,77 @@
+{
+  "phase": "Stage 1 \u2014 frozen backbone baseline",
+  "completed_at": "2026-05-02T02:44:25.169375",
+  "model": "facebook/wav2vec2-base",
+  "trainable_params": 1538,
+  "total_params": 94373250,
+  "training": {
+    "epochs": 5,
+    "batch_size": 32,
+    "learning_rate": 0.001,
+    "weight_decay": 0.01,
+    "class_weights": {
+      "bonafide": 4.919,
+      "spoof": 0.557
+    },
+    "loss": "weighted_cross_entropy",
+    "wall_clock_minutes": 248.8
+  },
+  "data": {
+    "train_utterances": 25380,
+    "train_windows": 34036,
+    "dev_utterances": 24844,
+    "dev_windows": 34047
+  },
+  "epoch_history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.3825,
+      "dev_eer": 0.1412,
+      "dev_auc": 0.9372,
+      "dev_accuracy": 0.8588
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.2558,
+      "dev_eer": 0.1153,
+      "dev_auc": 0.9538,
+      "dev_accuracy": 0.8847
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.2164,
+      "dev_eer": 0.1139,
+      "dev_auc": 0.9532,
+      "dev_accuracy": 0.886
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.1942,
+      "dev_eer": 0.1079,
+      "dev_auc": 0.9581,
+      "dev_accuracy": 0.8922
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.1762,
+      "dev_eer": 0.1009,
+      "dev_auc": 0.9621,
+      "dev_accuracy": 0.899
+    }
+  ],
+  "best": {
+    "dev_eer": 0.1009,
+    "dev_auc": 0.9621,
+    "dev_accuracy": 0.899,
+    "epoch": 5,
+    "checkpoint": "/content/drive/MyDrive/deepfake_audio/checkpoints/stage1_best.pt"
+  },
+  "wandb_run": "https://wandb.ai/sara-jaffrani17-dlp/deepfake-audio-detection/runs/dnckcfhh",
+  "notes": [
+    "Stage 1 trained only the classification head (1,538 params).",
+    "Wav2Vec 2.0 Base backbone fully frozen.",
+    "Dev EER decreased monotonically across all 5 epochs; model was still improving at epoch 5.",
+    "Result establishes a strong baseline: 10.09% dev EER with effectively a linear classifier on pretrained features.",
+    "Stage 2 (Phase 4) will unfreeze top transformer layers to push EER lower."
+  ]
+}
