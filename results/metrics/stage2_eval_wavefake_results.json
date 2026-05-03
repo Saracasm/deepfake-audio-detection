@@ -1,0 +1,73 @@
+{
+  "phase": "Phase 5c \u2014 Supplementary Evaluation on WaveFake",
+  "completed_at": "2026-05-03T02:30:38.193603",
+  "model_checkpoint": "/content/drive/MyDrive/deepfake_audio/checkpoints/stage2_best.pt",
+  "model_dev_eer": 0.0069,
+  "evaluation_dataset": {
+    "name": "WaveFake (Frank et al., 2021) \u2014 sampled subset",
+    "kaggle_source_spoof": "walimuhammadahmad/fakeaudio",
+    "kaggle_source_bonafide": "mathurinache/the-lj-speech-dataset",
+    "sampling_strategy": "Random sample of 1,500 LJSpeech bonafide + 1,000 spoof per vocoder \u00d7 9 vocoders",
+    "utterances_total": 10500,
+    "windows": 27483,
+    "bonafide_count": 1500,
+    "spoof_count": 9000,
+    "vocoders": [
+      "ljspeech_melgan",
+      "ljspeech_melgan_large",
+      "ljspeech_multi_band_melgan",
+      "ljspeech_full_band_melgan",
+      "ljspeech_parallel_wavegan",
+      "ljspeech_waveglow",
+      "ljspeech_hifiGAN",
+      "jsut_multi_band_melgan",
+      "jsut_parallel_wavegan"
+    ]
+  },
+  "inference": {
+    "batch_size": 16,
+    "mixed_precision": true,
+    "wall_clock_minutes": 7.9,
+    "windows_per_second": 58,
+    "note": "Slower windows/sec than ASVspoof because of resampling 22050/24000 \u2192 16000"
+  },
+  "overall_results": {
+    "eer": 0.2633,
+    "auc": 0.825,
+    "accuracy": 0.7368,
+    "threshold": 0.0
+  },
+  "cross_dataset_comparison": {
+    "stage2_dev_2019_seen_attacks": 0.0069,
+    "stage2_eval_2019_unseen_attacks": 0.0555,
+    "stage2_eval_2021_unseen_attacks_plus_codecs": 0.0909,
+    "stage2_eval_wavefake_novel_vocoders": 0.2633,
+    "interpretation": "Largest cross-dataset gap. Model trained on ASVspoof attacks generalizes only weakly to standalone neural vocoder pipelines."
+  },
+  "per_vocoder_eer": {
+    "ljspeech_melgan": 0.3112,
+    "ljspeech_melgan_large": 0.3385,
+    "ljspeech_multi_band_melgan": 0.2192,
+    "ljspeech_full_band_melgan": 0.306,
+    "ljspeech_parallel_wavegan": 0.2612,
+    "ljspeech_waveglow": 0.296,
+    "ljspeech_hifiGAN": 0.3323,
+    "jsut_multi_band_melgan": 0.0113,
+    "jsut_parallel_wavegan": 0.0083
+  },
+  "methodological_caveats": [
+    "JSUT vocoder EERs (~1%) are likely inflated by domain shortcuts: bonafide is English LJSpeech, JSUT spoofs are Japanese audio at different sample rate (24 kHz vs 22 kHz). Model may be classifying language/speaker rather than detecting spoofing.",
+    "The LJSpeech-based vocoder EERs (22-34%) are the methodologically meaningful results: same speaker, same content, same recording quality as bonafide; only the synthesis differs.",
+    "High EERs on LJSpeech vocoders (mean 29.4%) reveal that ASVspoof-trained models generalize poorly to clean neural vocoder pipelines. This matches the original WaveFake paper's observations.",
+    "Model has not been adapted to WaveFake \u2014 pure cross-dataset evaluation."
+  ],
+  "key_findings": [
+    "Cross-dataset robustness varies substantially by distribution shift type:",
+    "  - Unseen attack types in same dataset: +4.86 pp (0.69% \u2192 5.55%)",
+    "  - Real-world codec degradation: +3.54 pp (5.55% \u2192 9.09%)",
+    "  - Novel vocoder pipelines on different domain: +17.24 pp (9.09% \u2192 26.33%)",
+    "Model has learned to detect ASVspoof-specific synthesis artifacts but not pure vocoder artifacts.",
+    "Future work direction: include vocoder-only spoofing data during training to improve cross-dataset generalization."
+  ],
+  "raw_scores_path": "/content/deepfake-audio-detection/results/scores/stage2_eval_wavefake.npz"
+}
