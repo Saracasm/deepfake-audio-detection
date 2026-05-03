@@ -1,0 +1,140 @@
+{
+  "phase": "Phase 5b \u2014 Secondary Evaluation on ASVspoof 2021 LA",
+  "completed_at": "2026-05-03T01:22:38.422756",
+  "model_checkpoint": "/content/drive/MyDrive/deepfake_audio/checkpoints/stage2_best.pt",
+  "model_dev_eer": 0.0069,
+  "evaluation_dataset": {
+    "name": "ASVspoof 2021 LA \u2014 eval partition only",
+    "kaggle_source": "ajaysuryal/asvspoof2021-la (audio) + simontrann/asvspoof2021-la-key (labels)",
+    "utterances_total_in_partition": 148176,
+    "utterances_evaluated": 148175,
+    "utterances_skipped_corrupt": 1,
+    "windows": 173149,
+    "bonafide_count": 14816,
+    "spoof_count": 133359,
+    "attacks": [
+      "A07",
+      "A08",
+      "A09",
+      "A10",
+      "A11",
+      "A12",
+      "A13",
+      "A14",
+      "A15",
+      "A16",
+      "A17",
+      "A18",
+      "A19"
+    ],
+    "codecs": [
+      "none",
+      "alaw",
+      "ulaw",
+      "g722",
+      "gsm",
+      "opus",
+      "pstn"
+    ],
+    "channels": [
+      "-",
+      "ita_tx",
+      "loc_tx",
+      "mad_tx",
+      "sin_tx"
+    ]
+  },
+  "inference": {
+    "batch_size": 16,
+    "mixed_precision": true,
+    "wall_clock_minutes": 21.8,
+    "windows_per_second": 132
+  },
+  "overall_results": {
+    "eer": 0.0909,
+    "auc": 0.9629,
+    "accuracy": 0.9091,
+    "threshold": 0.5148
+  },
+  "cross_dataset_comparison": {
+    "stage2_dev_2019_seen_attacks": 0.0069,
+    "stage2_eval_2019_unseen_attacks": 0.0555,
+    "stage2_eval_2021_unseen_attacks_plus_codecs": 0.0909,
+    "gap_2019_eval_to_2021_eval_pp": 3.54,
+    "interpretation": "Real-world codec degradation adds ~3.5 percentage points of error on top of 2019 unseen-attack eval."
+  },
+  "per_codec_eer": {
+    "none": 0.0524,
+    "opus": 0.053,
+    "g722": 0.0542,
+    "ulaw": 0.0781,
+    "alaw": 0.0837,
+    "pstn": 0.1114,
+    "gsm": 0.1153
+  },
+  "per_codec_summary": {
+    "best_codec": {
+      "id": "none",
+      "eer": 0.0524
+    },
+    "worst_codec": {
+      "id": "gsm",
+      "eer": 0.1153
+    },
+    "interpretation": "Aggressive lossy compression (gsm, pstn) degrades performance by ~6 pp vs uncompressed. Modern codecs (opus, g722) preserve detection signal well."
+  },
+  "per_channel_eer": {
+    "-": 0.0524,
+    "ita_tx": 0.0927,
+    "loc_tx": 0.0875,
+    "mad_tx": 0.1114,
+    "sin_tx": 0.09
+  },
+  "per_attack_eer": {
+    "A07": 0.0953,
+    "A08": 0.0556,
+    "A09": 0.0332,
+    "A10": 0.2037,
+    "A11": 0.0397,
+    "A12": 0.0511,
+    "A13": 0.012,
+    "A14": 0.1475,
+    "A15": 0.1689,
+    "A16": 0.0522,
+    "A17": 0.0831,
+    "A18": 0.0931,
+    "A19": 0.0717
+  },
+  "per_attack_summary": {
+    "n_attacks": 13,
+    "mean_eer_across_attacks": 0.089,
+    "median_eer_across_attacks": 0.0717,
+    "worst_attack": {
+      "id": "A10",
+      "eer": 0.2037,
+      "consistent_with_2019": true
+    },
+    "best_attack": {
+      "id": "A13",
+      "eer": 0.012,
+      "consistent_with_2019": true
+    }
+  },
+  "comparisons_to_published_baselines_2021": {
+    "lfcc_gmm_eer": 0.2556,
+    "cqcc_gmm_eer": 0.193,
+    "lfcc_lcnn_eer": 0.0926,
+    "rawnet2_eer": 0.095,
+    "our_eer": 0.0909,
+    "interpretation": "Stage 2 model matches the strongest neural baselines (LFCC-LCNN 9.26%, RawNet2 9.50%) on 2021 LA, despite being trained only on 2019 data with zero codec augmentation."
+  },
+  "raw_scores_path": "/content/deepfake-audio-detection/results/scores/stage2_eval2021.npz",
+  "wandb_run_training": "https://wandb.ai/sara-jaffrani17-dlp/deepfake-audio-detection/runs/l1q4dvsx",
+  "notes": [
+    "Cross-dataset evaluation on ASVspoof 2021 LA. Model was trained on 2019 LA only.",
+    "9.09% EER overall is competitive with strong published 2021 LA baselines (LFCC-LCNN 9.26%, RawNet2 9.50%).",
+    "Per-codec analysis reveals model's vulnerability to aggressive lossy compression (gsm 11.53%, pstn 11.14%).",
+    "Per-attack rankings consistent with 2019: A10/A14/A15 hardest, A13/A09 easiest.",
+    "Phase 5c next: cross-dataset evaluation on WaveFake (vocoder-only synthesis)."
+  ]
+}
