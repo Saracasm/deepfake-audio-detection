@@ -49,3 +49,7 @@ dist/
 
 # Allow protocol files (small, safe to commit)
 !data/protocols/
+
+# Gradio runtime artifacts (auto-generated SSL certs, cache, etc.)
+.gradio/
+**/.gradio/
