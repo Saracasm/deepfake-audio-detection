@@ -1,0 +1,47 @@
+{
+  "examples": [
+    {
+      "filename": "01_bonafide_easy.flac",
+      "display_name": "Real speech (bonafide)",
+      "description": "A clear example of real human speech. Model should be very confident.",
+      "expected_label": "bonafide",
+      "source_utterance_id": "LA_E_5849185",
+      "attack_id": null
+    },
+    {
+      "filename": "02_spoof_A13_easy.flac",
+      "display_name": "Synthetic speech \u2014 Attack A13 (well-detected)",
+      "description": "A spoofing attack the model handles well (0.24% EER on this attack family).",
+      "expected_label": "spoof",
+      "source_utterance_id": "LA_E_5932896",
+      "attack_id": "A13"
+    },
+    {
+      "filename": "03_spoof_A07_medium.flac",
+      "display_name": "Synthetic speech \u2014 Attack A07 (moderate)",
+      "description": "A medium-difficulty attack. Note how the per-window scores show the model gaining confidence over time.",
+      "expected_label": "spoof",
+      "source_utterance_id": "LA_E_8844552",
+      "attack_id": "A07"
+    },
+    {
+      "filename": "04_spoof_A10_hardest.flac",
+      "display_name": "Synthetic speech \u2014 Attack A10 (known weakness)",
+      "description": "An attack family this model struggles with (15.54% EER). Honest demonstration that no detector is universal.",
+      "expected_label": "spoof",
+      "source_utterance_id": "LA_E_8868279",
+      "attack_id": "A10"
+    },
+    {
+      "filename": "05_bonafide_long.flac",
+      "display_name": "Real speech (longer clip)",
+      "description": "An 8-second clip showing how the model integrates predictions across multiple 4-second windows.",
+      "expected_label": "bonafide",
+      "source_utterance_id": "LA_E_2790922",
+      "attack_id": null
+    }
+  ],
+  "selection_criteria": "Hand-picked from ASVspoof 2019 LA eval set to span easy detection, moderate detection, and known-difficult attack types. Selection is intentionally diverse to show realistic model behavior including failure cases.",
+  "source_dataset": "ASVspoof 2019 LA",
+  "license": "ODC Attribution License (ODC-By)"
+}
