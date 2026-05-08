@@ -1,3 +1,16 @@
+---
+title: Deepfake Audio Detection
+emoji: 🎤
+colorFrom: purple
+colorTo: pink
+sdk: gradio
+sdk_version: "5.50.0"
+app_file: app/app.py
+pinned: false
+license: mit
+short_description: Detect AI-generated speech using Wav2Vec 2.0
+---
+
 # Deepfake Audio Detection — Wav2Vec 2.0 Fine-tuning
 
 Detection of synthetic (deepfake) speech using a fine-tuned Wav2Vec 2.0 model. Trained on ASVspoof 2019 LA, evaluated cross-dataset on ASVspoof 2019 LA eval, ASVspoof 2021 LA, and WaveFake.
