@@ -52,7 +52,7 @@ Our model outperforms LFCC-GMM on 2019 LA by 2.54 pp and matches the strongest n
 ## Architecture
 
 <p align="center">
-  <img src="architecture.png" alt="Wav2Vec 2.0 Architecture for Deepfake Detection" width="100%"/>
+  <img src="src\architecture.png" alt="Wav2Vec 2.0 Architecture for Deepfake Detection" width="100%"/>
 </p>
 
 The model takes raw 16 kHz audio, processes it through Wav2Vec 2.0's CNN encoder and 12-layer transformer stack, mean-pools the sequence into a 768-dim embedding, and classifies it through a linear head. Purple layers are trainable in Stage 2; gray layers remain frozen.
@@ -60,7 +60,7 @@ The model takes raw 16 kHz audio, processes it through Wav2Vec 2.0's CNN encoder
 ### Two-stage fine-tuning
 
 <p align="center">
-  <img src="finetuning.png" alt="Two-Stage Fine-Tuning Strategy" width="100%"/>
+  <img src="src/finetuning.png" alt="Two-Stage Fine-Tuning Strategy" width="100%"/>
 </p>
 
 | Stage | What's trained | Trainable params | Dev EER |
