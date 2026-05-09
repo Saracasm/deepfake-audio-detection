@@ -1,28 +1,39 @@
+<p align="center">
+  <img src="https://img.shields.io/badge/Wav2Vec_2.0-Fine--tuned-7c3aed?style=for-the-badge&logo=pytorch&logoColor=white" alt="Wav2Vec 2.0"/>
+  <img src="https://img.shields.io/badge/ASVspoof_2019_LA-5.55%25_EER-10b981?style=for-the-badge" alt="5.55% EER"/>
+  <img src="https://img.shields.io/badge/HuggingFace-Live_Demo-f59e0b?style=for-the-badge&logo=huggingface&logoColor=white" alt="Live Demo"/>
+</p>
+
+<h1 align="center">Deepfake Audio Detection</h1>
+
+<p align="center">
+  <strong>AI Voice Cloning Detection via Fine-Tuned Self-Supervised Speech Transformers</strong><br>
+  Sara Iqbal & Areeba Arif · FAST-NUCES Spring 2026 · Deep Learning Project
+</p>
+
+<p align="center">
+  <a href="https://huggingface.co/spaces/Sara1708/deepfake-audio-detector">🎤 Try the Live Demo</a> · 
+  <a href="https://huggingface.co/Sara1708/deepfake-audio-wav2vec2">📦 Model Weights</a> · 
+  <a href="https://sara1708-deepfake-audio-detector.hf.space/api">🔌 API Endpoint</a>
+</p>
+
 ---
-title: Deepfake Audio Detection
-emoji: 🎤
-colorFrom: purple
-colorTo: pink
-sdk: gradio
-sdk_version: "5.50.0"
-app_file: app/app.py
-pinned: false
-license: mit
-short_description: Detect AI-generated speech using Wav2Vec 2.0
+
+## What this project does
+
+A deep learning system that detects whether an audio clip contains **real human speech** or **AI-synthesized speech**. Upload any audio file, record from your microphone, or try the built-in examples — the model returns a prediction with calibrated confidence scores.
+
+Built by fine-tuning **Wav2Vec 2.0 Base** (a self-supervised speech transformer pretrained on 960 hours of speech) on the **ASVspoof 2019 LA** benchmark dataset using a two-stage training strategy.
+
 ---
 
-# Deepfake Audio Detection — Wav2Vec 2.0 Fine-tuning
+## Results at a glance
 
-Detection of synthetic (deepfake) speech using a fine-tuned Wav2Vec 2.0 model. Trained on ASVspoof 2019 LA, evaluated cross-dataset on ASVspoof 2019 LA eval, ASVspoof 2021 LA, and WaveFake.
-
-## Headline results
-
-| Evaluation | EER | What it measures |
+| Benchmark | EER | What it tests |
 |---|---|---|
-| ASVspoof 2019 LA dev (seen attacks A01-A06) | **0.69%** | In-distribution memorization check |
-| ASVspoof 2019 LA eval (unseen attacks A07-A19) | **5.55%** | Generalization to new attack types |
-| ASVspoof 2021 LA eval (unseen attacks + codec degradation) | **9.09%** | Real-world transmission conditions |
-| WaveFake (LJSpeech vocoders, mean) | **29.4%** | Out-of-distribution vocoder synthesis |
+| **ASVspoof 2019 LA** | **5.55%** | 13 unseen attack types (TTS + voice conversion) |
+| **ASVspoof 2021 LA** | **9.09%** | Same attacks through telephone codecs |
+| **WaveFake** | **26.33%** | Novel neural vocoder pipelines (MelGAN, HiFi-GAN) |
 
 ### Comparison to published baselines
 
@@ -30,120 +41,199 @@ Detection of synthetic (deepfake) speech using a fine-tuned Wav2Vec 2.0 model. T
 |---|---|---|
 | Official LFCC-GMM baseline | 8.09% | 25.56% |
 | Official CQCC-GMM baseline | 9.57% | 19.30% |
-| Official LFCC-LCNN baseline | - | 9.26% |
-| Official RawNet2 baseline | - | 9.50% |
-| **This work (Wav2Vec 2.0 + fine-tuning)** | **5.55%** | **9.09%** |
+| Official LFCC-LCNN baseline | — | 9.26% |
+| Official RawNet2 baseline | — | 9.50% |
+| **This work (Wav2Vec 2.0)** | **5.55%** | **9.09%** |
 
-Our model outperforms the LFCC-GMM 2019 baseline by 2.54 percentage points and matches the strongest neural baselines on 2021 LA, despite no codec-specific augmentation during training.
+Our model outperforms LFCC-GMM on 2019 LA by 2.54 pp and matches the strongest neural baselines on 2021 LA — without any codec-specific training augmentation.
+
+---
 
 ## Architecture
 
-Pipeline:
+<p align="center">
+  <img src="architecture.png" alt="Wav2Vec 2.0 Architecture for Deepfake Detection" width="100%"/>
+</p>
 
-1. Raw waveform input (16 kHz, 4 sec, 64,000 samples)
-2. Wav2Vec 2.0 Base backbone (95M params, 12 transformer layers)
-   - Stage 1: fully frozen
-   - Stage 2: top 2 layers + final LayerNorm unfrozen (~14M trainable)
-3. Mean pooling over time dimension
-4. Linear classification head (768 -> 2)
-5. Softmax -> P(spoof), P(bonafide)
+The model takes raw 16 kHz audio, processes it through Wav2Vec 2.0's CNN encoder and 12-layer transformer stack, mean-pools the sequence into a 768-dim embedding, and classifies it through a linear head. Purple layers are trainable in Stage 2; gray layers remain frozen.
 
-### Two-stage training rationale
+### Two-stage fine-tuning
 
-- **Stage 1**: train only the linear head on top of frozen pretrained features. Establishes that pretrained Wav2Vec representations already carry strong anti-spoofing signal. Result: 10.09% dev EER with 1,538 trainable params.
-- **Stage 2**: unfreeze the top 2 transformer layers, lower learning rate from 1e-3 to 1e-5 (warmup + linear decay), enable mixed precision. Result: 0.69% dev EER, 14.18M trainable params.
+<p align="center">
+  <img src="finetuning.png" alt="Two-Stage Fine-Tuning Strategy" width="100%"/>
+</p>
 
-## Quickstart
+| Stage | What's trained | Trainable params | Dev EER |
+|---|---|---|---|
+| **Stage 1** | Linear head only | 1,538 | 10.09% |
+| **Stage 2** | Top 2 layers + LayerNorm + head | 14.18M (15% of model) | **0.69%** |
 
-### Inference on a single file
+Stage 2 achieves a **93% relative error reduction** over Stage 1 by unfreezing just 15% of the model with a lower learning rate (1e-5) and 10% warmup.
 
-    from src.inference.predict import DeepfakeDetector
-    
-    detector = DeepfakeDetector(checkpoint_path="path/to/stage2_best.pt")
-    result = detector.predict("path/to/audio.wav")
-    print(result)
-    # {
-    #   "spoof_probability": 0.84,
-    #   "prediction": "spoof",
-    #   "confidence": 0.84,
-    #   "utterance_duration_sec": 3.42,
-    #   "n_windows": 1,
-    #   "threshold_used": 0.5
-    # }
+---
 
-The detector handles any audio format readable by torchaudio. Audio is automatically resampled to 16 kHz and segmented into 4-second windows; per-window scores are mean-aggregated.
+## Honest limitations
 
-## Repository structure
+We tested the model beyond its training domain and are transparent about where it fails:
 
-    .
-    ├── src/
-    │   ├── data/
-    │   │   ├── protocols.py             # ASVspoof 2019 LA protocol parser
-    │   │   ├── protocols_2021.py        # ASVspoof 2021 LA protocol parser
-    │   │   ├── preprocessing.py         # audio loading, resampling, windowing
-    │   │   └── dataset.py               # PyTorch Dataset
-    │   ├── models/
-    │   │   └── wav2vec_classifier.py    # Wav2Vec backbone + head
-    │   ├── training/
-    │   │   └── trainer.py               # training loop with mixed precision + LR scheduler
-    │   ├── evaluation/
-    │   │   └── metrics.py               # EER, AUC, window-to-utterance aggregation
-    │   └── inference/
-    │       └── predict.py               # production inference wrapper
-    ├── notebooks/
-    │   ├── 01_data_acquisition.ipynb    # Phase 2: data exploration + pipeline
-    │   ├── 02_train_stage2.ipynb        # Phase 3 + 4: training (Stage 1 + Stage 2)
-    │   └── 03_evaluation.ipynb          # Phase 5: cross-dataset evaluation
-    ├── results/
-    │   ├── metrics/                     # JSON results for each phase
-    │   │   ├── stage1_results.json
-    │   │   ├── stage2_results.json
-    │   │   ├── stage2_eval2019_results.json
-    │   │   ├── stage2_eval2021_results.json
-    │   │   └── stage2_eval_wavefake_results.json
-    │   └── scores/                      # raw per-utterance inference scores (.npz)
-    └── docs/
-        └── environment.md               # verified runtime environment
+- **A10 attack blind spot:** A10 uses Tacotron 2 + WaveRNN, producing speech that is acoustically indistinguishable from real speech even to human listeners (confirmed by the ASVspoof 2019 paper). The model classifies A10 samples as authentic with 100% confidence — a fundamental limit of acoustic-feature-based detection.
+
+- **WaveFake cross-corpus gap (26.33% EER):** The model learned ASVspoof-specific synthesis artifacts (TTS + voice conversion) but doesn't generalise to pure neural vocoder attacks (MelGAN, HiFi-GAN, WaveGlow). This is a training data coverage gap, not classical overfitting — the 5.55% on 13 unseen ASVspoof attacks proves the model learned transferable patterns within its training family.
+
+- **Codec sensitivity:** GSM and PSTN telephone codecs degrade EER by ~6 percentage points. Codec augmentation during training would likely close this gap.
+
+- **Not a production security tool.** Real-world deepfakes use synthesis methods this model has never seen. This is a research demonstration, not a deployment-ready detector.
+
+---
+
+## Project structure
+
+```
+deepfake-audio-detection/
+├── app/
+│   ├── app.py                    # Gradio web app (4-tab interface)
+│   ├── examples/                 # Example audio clips (easy → hardest)
+│   └── src/
+│       ├── inference/predict.py  # DeepfakeDetector wrapper class
+│       ├── models/               # Wav2Vec2 classifier architecture
+│       └── data/                 # Preprocessing utilities
+├── assets/
+│   ├── architecture.png          # Architecture diagram
+│   └── finetuning.png            # Two-stage training diagram
+├── notebooks/
+│   ├── 01_data_preparation.ipynb
+│   ├── 02_stage1_training.ipynb
+│   ├── 03_evaluation.ipynb
+│   └── 04_deployment.ipynb
+├── results/
+│   └── scores/                   # Evaluation score arrays
+├── requirements.txt
+└── README.md
+```
+
+---
+
+## Quick start
+
+### Try the live demo
+
+**[https://huggingface.co/spaces/Sara1708/deepfake-audio-detector](https://huggingface.co/spaces/Sara1708/deepfake-audio-detector)**
+
+Upload audio, record from your mic, or click an example. No setup needed.
+
+### Run locally
+
+```bash
+git clone https://github.com/Saracasm/deepfake-audio-detection.git
+cd deepfake-audio-detection
+pip install -r requirements.txt
+cd app && python app.py
+```
+
+### Use the API
+
+The deployed Gradio app exposes a REST API automatically:
+
+```python
+from gradio_client import Client
+
+client = Client("Sara1708/deepfake-audio-detector")
+result = client.predict(
+    audio="path/to/audio.wav",
+    api_name="/predict"
+)
+print(result)
+```
+
+### Use the model directly
+
+```python
+from src.inference.predict import DeepfakeDetector
+
+detector = DeepfakeDetector(checkpoint_path="path/to/stage2_best.pt")
+result = detector.predict("audio.wav", return_per_window=True)
+
+print(f"Prediction: {result['prediction']}")
+print(f"Confidence: {result['confidence']:.2%}")
+print(f"Spoof probability: {result['spoof_probability']:.4f}")
+```
+
+---
 
 ## Datasets
 
-This project uses three external datasets, none of which are committed to this repository:
+| Dataset | Role | Size | Source |
+|---|---|---|---|
+| **ASVspoof 2019 LA** | Training + primary eval | 2,580 genuine + 22,800 spoofed (train) | [datashare.ed.ac.uk](https://datashare.ed.ac.uk/handle/10283/3336) |
+| **ASVspoof 2021 LA** | Cross-dataset eval | Codec-degraded versions | [ASVspoof.org](https://www.asvspoof.org/) |
+| **WaveFake** | Out-of-domain eval | ~117,000 clips from 6 vocoders | [GitHub](https://github.com/RUB-SysSec/WaveFake) |
 
-- **ASVspoof 2019 LA** ([paper](https://arxiv.org/abs/1911.01601)) - training and primary eval. Available via Kaggle: `anishsarkar22/asvpoof-2019-dataset-la`.
-- **ASVspoof 2021 LA** ([paper](https://arxiv.org/abs/2109.00537)) - secondary eval, real-world codec conditions. Available via Kaggle: `ajaysuryal/asvspoof2021-la` plus key file `simontrann/asvspoof2021-la-key`.
-- **WaveFake** ([paper](https://arxiv.org/abs/2111.02813)) - supplementary eval, neural vocoder synthesis. Available via Kaggle: `walimuhammadahmad/fakeaudio` plus LJSpeech `mathurinache/the-lj-speech-dataset`.
+---
 
-## Experiment tracking
+## Key design decisions
 
-All training runs logged to Weights & Biases:
-- Project: https://wandb.ai/sara-jaffrani17-dlp/deepfake-audio-detection
-- Stage 2 final run: see `stage2-full` (5,320 training steps, 10 epochs)
+| Decision | Rationale |
+|---|---|
+| **Wav2Vec 2.0 Base** over Large | Sufficient capacity for binary classification; trains on T4 GPU |
+| **Two-stage training** | Stage 1 validates the approach (10.09% with 1,538 params); Stage 2 refines it |
+| **Class-weighted CE loss** | Handles 9:1 spoof:bonafide imbalance (weights: bonafide=4.92, spoof=0.56) |
+| **4-sec windows, 50% overlap** | Consistent input length; mean aggregation over windows for utterance-level prediction |
+| **Mixed precision (fp16)** | Reduced training time from ~6h to 2h 56m on T4 |
+| **WaveFake evaluation** | Not required by the project — included for honest cross-corpus analysis |
 
-## Key findings
+---
 
-1. **Pretrained Wav2Vec features carry significant anti-spoofing signal.** A frozen-backbone linear classifier achieves 10.09% dev EER on ASVspoof 2019 LA - competitive with hand-crafted feature baselines.
-2. **Two-stage fine-tuning is highly effective.** Unfreezing the top 2 transformer layers (15% of model params) drops dev EER from 10.09% to 0.69% - a 93% relative error reduction.
-3. **Generalization profile maps cleanly to distribution shift type:**
-   - Unseen attacks (same dataset): +4.86 pp degradation
-   - Real-world codec degradation: +3.54 pp additional degradation
-   - Novel vocoder pipelines (different domain): +17.24 pp additional degradation
-4. **Per-codec analysis identifies model weaknesses.** Aggressive lossy compression (GSM, PSTN) degrades performance ~6 pp vs uncompressed audio. Modern codecs (Opus, G.722) preserve detection signal well.
-5. **WaveFake reveals an ASVspoof-specific overfitting pattern.** The model has learned ASVspoof-style attack artifacts but not standalone neural vocoder artifacts. This matches findings in the original WaveFake paper.
+## What this project demonstrates
 
-## Hardware
+1. **Wav2Vec 2.0 features work for deepfake detection.** Pretrained speech representations carry strong anti-spoofing signal, unlockable with minimal fine-tuning (15% of model parameters). The result matches or beats published neural baselines.
 
-Trained on Google Colab Pro:
-- Stage 1: T4 GPU, 4h 8m wall-clock
-- Stage 2: T4 GPU with mixed precision, 2h 56m wall-clock
-- All evaluations: T4 GPU, 35-45 minutes total
+2. **Single-corpus training has measured limits.** The A10 blind spot reveals a fundamental challenge: when synthesis is acoustically indistinguishable from real speech (even to humans), acoustic-feature-based detection reaches its theoretical limit. The WaveFake results show cross-family generalisation requires cross-family training data.
 
-## Authors
+3. **The path forward is clear.** Universal AI voice cloning detection requires multi-corpus, multi-family training — combining ASVspoof, WaveFake, and newer datasets. This project establishes the baseline with measured evidence.
 
-- Sara Iqbal (23K-0669)
-- Areeba Arif (23K-0618)
+---
 
-Course: Deep Learning Project, FAST-NUCES, Spring 2026.
+## Tech stack
 
-## License
+- **Model:** Wav2Vec 2.0 Base (Facebook AI / HuggingFace Transformers)
+- **Training:** PyTorch, mixed precision (fp16), Weights & Biases logging
+- **App:** Gradio 5.x with custom CSS, inline SVG diagrams
+- **Deployment:** HuggingFace Spaces (free CPU tier)
+- **Development:** Google Colab (T4 GPU for training)
 
-Code: MIT. Datasets retain their original licenses (see individual dataset pages).
+---
+
+## Citations
+
+```bibtex
+@article{wang2020asvspoof,
+  title={ASVspoof 2019: A large-scale public database of synthesized, converted and replayed speech},
+  author={Wang, Xin and Yamagishi, Junichi and Todisco, Massimiliano and others},
+  journal={Computer Speech \& Language},
+  year={2020}
+}
+
+@article{baevski2020wav2vec,
+  title={wav2vec 2.0: A framework for self-supervised learning of speech representations},
+  author={Baevski, Alexei and Zhou, Yuhao and Mohamed, Abdelrahman and Auli, Michael},
+  journal={NeurIPS},
+  year={2020}
+}
+
+@inproceedings{frank2021wavefake,
+  title={WaveFake: A Data Set to Facilitate Audio Deepfake Detection},
+  author={Frank, Joel and Sch{\"o}nherr, Lea},
+  booktitle={NeurIPS Datasets and Benchmarks Track},
+  year={2021}
+}
+```
+
+---
+
+<p align="center">
+  <strong>Built by</strong> Sara Iqbal & Areeba Arif · FAST-NUCES Spring 2026<br>
+  <a href="https://huggingface.co/spaces/Sara1708/deepfake-audio-detector">Live Demo</a> · 
+  <a href="https://huggingface.co/Sara1708/deepfake-audio-wav2vec2">Model</a> · 
+  <a href="https://sara1708-deepfake-audio-detector.hf.space/api">API</a>
+</p>
+
