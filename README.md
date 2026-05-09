@@ -14,7 +14,7 @@
 <p align="center">
   <a href="https://huggingface.co/spaces/Sara1708/deepfake-audio-detector">🎤 Try the Live Demo</a> · 
   <a href="https://huggingface.co/Sara1708/deepfake-audio-wav2vec2">📦 Model Weights</a> · 
-  <a href="https://sara1708-deepfake-audio-detector.hf.space/api">🔌 API Endpoint</a>
+  <a href="https://sara1708-deepfake-audio-detector.hf.space/api">🔌 API Endpoint</a> . 
   <a href="https://wandb.ai/sara-jaffrani17-dlp/deepfake-audio-detection/workspace?nw=nwusersarajaffrani17"> 📈 Training Visuals</a>
 </p>
 
